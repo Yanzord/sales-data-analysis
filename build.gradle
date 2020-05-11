@@ -5,7 +5,6 @@ plugins {
 
 group 'com.github.yanzord.salesdataanalysis'
 version '1.0-SNAPSHOT'
-def springVersion = '5.2.2.RELEASE'
 sourceCompatibility = 1.8
 
 repositories {
@@ -15,14 +14,10 @@ repositories {
 dependencies {
     implementation([
         'log4j:log4j:1.2.17',
-        "org.springframework:spring-core:$springVersion",
-        "org.springframework:spring-context:$springVersion",
-        "org.springframework:spring-beans:$springVersion"
     ])
 
     testImplementation([
             'junit:junit:4.12',
-            "org.springframework:spring-test:$springVersion",
             'org.mockito:mockito-all:1.10.19'
     ])
 }

@@ -9,10 +9,9 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
+import static com.github.yanzord.salesdataanalysis.constant.Constant.*;
+
 public class SalesDataDAO {
-    private static final String HOME_PATH = System.getenv("HOME");
-    private static final Path INPUT_FILE_PATH = Paths.get(HOME_PATH.concat("/data/in/"));
-    private static final Path OUTPUT_FILE_PATH = Paths.get(HOME_PATH.concat("/data/out/"));
     private static final String FILE_EXTENSION = ".dat";
     private Logger logger = Logger.getLogger(SalesDataDAO.class);
 

@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.yanzord.salesdataanalysis.constant.Constant.*;
+import static com.github.yanzord.salesdataanalysis.constant.Constants.*;
 
 public class SalesDataDAO {
     private static final String FILE_EXTENSION = ".dat";

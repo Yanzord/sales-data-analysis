@@ -5,12 +5,12 @@ import java.util.List;
 public class Sale {
     private int saleId;
     private List<Item> items;
-    private String salesmanName;
+    private Salesman salesman;
 
-    public Sale(int saleId, List<Item> items, String salesmanName) {
+    public Sale(int saleId, List<Item> items, Salesman salesman) {
         this.saleId = saleId;
         this.items = items;
-        this.salesmanName = salesmanName;
+        this.salesman = salesman;
     }
 
     public int getSaleId() {
@@ -29,11 +29,11 @@ public class Sale {
         this.items = items;
     }
 
-    public String getSalesmanName() {
-        return salesmanName;
+    public Salesman getSalesman() {
+        return salesman;
     }
 
-    public void setSalesmanName(String salesmanName) {
-        this.salesmanName = salesmanName;
+    public void setSalesman(Salesman salesman) {
+        this.salesman = salesman;
     }
 }

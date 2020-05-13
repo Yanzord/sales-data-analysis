@@ -6,4 +6,6 @@ public class SalesDataAnalyzer {
     public SalesDataAnalyzer() {
         this.salesDataProcessor = new SalesDataProcessor();
     }
+
+
 }

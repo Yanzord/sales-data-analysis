@@ -1,37 +1,37 @@
 package com.github.yanzord.salesdataanalysis.model;
 
 public class Item {
-    private int id;
-    private int quantity;
-    private double price;
+    private String id;
+    private Integer quantity;
+    private Double price;
 
-    public Item(int id, int quantity, double price) {
+    public Item(String id, Integer quantity, Double price) {
         this.id = id;
         this.quantity = quantity;
         this.price = price;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 }

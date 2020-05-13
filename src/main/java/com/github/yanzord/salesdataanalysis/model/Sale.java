@@ -3,21 +3,21 @@ package com.github.yanzord.salesdataanalysis.model;
 import java.util.List;
 
 public class Sale {
-    private int saleId;
+    private String saleId;
     private List<Item> items;
-    private Salesman salesman;
+    private String salesmanName;
 
-    public Sale(int saleId, List<Item> items, Salesman salesman) {
+    public Sale(String saleId, List<Item> items, String salesmanName) {
         this.saleId = saleId;
         this.items = items;
-        this.salesman = salesman;
+        this.salesmanName = salesmanName;
     }
 
-    public int getSaleId() {
+    public String getSaleId() {
         return saleId;
     }
 
-    public void setSaleId(int saleId) {
+    public void setSaleId(String saleId) {
         this.saleId = saleId;
     }
 
@@ -29,11 +29,11 @@ public class Sale {
         this.items = items;
     }
 
-    public Salesman getSalesman() {
-        return salesman;
+    public String getSalesmanName() {
+        return salesmanName;
     }
 
-    public void setSalesman(Salesman salesman) {
-        this.salesman = salesman;
+    public void setSalesmanName(String salesmanName) {
+        this.salesmanName = salesmanName;
     }
 }

@@ -3,9 +3,9 @@ package com.github.yanzord.salesdataanalysis.model;
 public class Salesman {
     private String cpf;
     private String name;
-    private double salary;
+    private Double salary;
 
-    public Salesman(String cpf, String name, double salary) {
+    public Salesman(String cpf, String name, Double salary) {
         this.cpf = cpf;
         this.name = name;
         this.salary = salary;
@@ -27,7 +27,7 @@ public class Salesman {
         this.name = name;
     }
 
-    public double getSalary() {
+    public Double getSalary() {
         return salary;
     }
 

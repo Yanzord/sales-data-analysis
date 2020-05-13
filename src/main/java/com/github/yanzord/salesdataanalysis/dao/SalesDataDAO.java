@@ -1,5 +1,7 @@
 package com.github.yanzord.salesdataanalysis.dao;
 
+import com.github.yanzord.salesdataanalysis.exception.DirectoryNotFoundException;
+import com.github.yanzord.salesdataanalysis.exception.InvalidFileExtensionException;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -19,19 +21,17 @@ public class SalesDataDAO {
         logger.info("Reading File: " + file.toString());
 
         if (!Files.exists(INPUT_FILE_PATH)) {
-            logger.error("Input directory doesn't exist.");
-            throw new IllegalArgumentException();
+            throw new DirectoryNotFoundException("Input directory doesn't exist.");
         }
 
         if (!file.getFileName().toString().endsWith(FILE_EXTENSION)) {
-            logger.error("Not a valid .dat file.");
-            throw new IllegalArgumentException();
+            throw new InvalidFileExtensionException("Not a valid .dat file.");
         }
 
         try {
             return Files.readAllLines(file);
         } catch (IOException e) {
-            logger.warn(e.getMessage());
+            logger.error("An error has occurred while reading the file: " + e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -40,15 +40,13 @@ public class SalesDataDAO {
         logger.info("Starting to write file: " + fileName);
 
         if (!Files.exists(OUTPUT_FILE_PATH)) {
-            logger.error("Output directory doesn't exist.");
-            throw new IllegalArgumentException();
+            throw new DirectoryNotFoundException("Output directory doesn't exist.");
         }
 
         try {
             Files.write(OUTPUT_FILE_PATH.resolve(Paths.get(fileName)), content.getBytes());
         } catch (IOException e) {
-            logger.error(e.getMessage());
-            throw new RuntimeException();
+            logger.error("An error has occurred while writing the file: " + e.getMessage());
         }
     }
 }

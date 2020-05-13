@@ -3,21 +3,18 @@ package com.github.yanzord.salesdataanalysis.service;
 import com.github.yanzord.salesdataanalysis.dao.SalesDataDAO;
 import com.github.yanzord.salesdataanalysis.exception.InvalidIdentifierException;
 import com.github.yanzord.salesdataanalysis.exception.InvalidSeparatorException;
-import com.github.yanzord.salesdataanalysis.model.Customer;
-import com.github.yanzord.salesdataanalysis.model.Sale;
-import com.github.yanzord.salesdataanalysis.model.SalesData;
-import com.github.yanzord.salesdataanalysis.model.Salesman;
+import com.github.yanzord.salesdataanalysis.model.*;
 import org.apache.log4j.Logger;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.github.yanzord.salesdataanalysis.constant.Constants.SEPARATOR;
+import static com.github.yanzord.salesdataanalysis.constant.Constants.*;
 
 public class SalesDataProcessor {
-    private static final int NUMBER_OF_SEPARATORS = 3;
     private SalesDataDAO salesDataDAO;
     private Logger logger = Logger.getLogger(SalesDataProcessor.class);
 
@@ -37,37 +34,136 @@ public class SalesDataProcessor {
         fileLines.forEach(line -> {
             String lineIdentifier = line.substring(0, 3);
 
-            if (lineIdentifier.equals(LineIdentifier.SALESMAN.getIdentifier())) {
-                salesmen.add(processSalesmen(line));
-            }
-
-            if (lineIdentifier.equals(LineIdentifier.CUSTOMER.getIdentifier())) {
-                customers.add(processCustomer(line));
-            }
-
-            if (lineIdentifier.equals(LineIdentifier.SALE.getIdentifier())) {
-                sales.add(processSale(line));
+            switch (LineIdentifier.valueOfIdentifier(lineIdentifier)) {
+                case SALESMAN: {
+                    salesmen.add(processSalesman(line));
+                    break;
+                }
+                case CUSTOMER: {
+                    customers.add(processCustomer(line));
+                    break;
+                }
+                case SALE: {
+                    sales.add(processSale(line));
+                    break;
+                }
+                default: {
+                    throw new InvalidIdentifierException(INVALID_IDENTIFIER_MESSAGE);
+                }
             }
         });
 
         return new SalesData(salesmen, customers, sales);
     }
 
-    private Sale processSale(String line) {
-        return null;
+    private Salesman processSalesman(String line) {
+        logger.info("Processing salesman from line: " + line);
+
+        List<String> splittedLine = Arrays.asList(line.split(SEPARATOR));
+
+        if (splittedLine.size() > NUMBER_OF_SEPARATORS + 1) {
+            int indexOfLastElement = splittedLine.size() - 1;
+
+            String cpf = splittedLine.get(1);
+            Double salary = Double.valueOf(splittedLine.get(indexOfLastElement));
+
+            List<String> splittedName = splittedLine.subList(1, indexOfLastElement);
+            String name = String.join(SEPARATOR, splittedName);
+
+            return new Salesman(cpf, name, salary);
+        }
+
+        if (splittedLine.size() == NUMBER_OF_SEPARATORS + 1) {
+            String cpf = splittedLine.get(1);
+            String name = splittedLine.get(2);
+            Double salary = Double.valueOf(splittedLine.get(3));
+
+            return new Salesman(cpf, name, salary);
+        }
+
+        throw new InvalidSeparatorException(INVALID_SEPARATOR_MESSAGE);
     }
 
     private Customer processCustomer(String line) {
-        return null;
+        logger.info("Processing customer from line: " + line);
+
+        List<String> splittedLine = Arrays.asList(line.split(SEPARATOR));
+
+        if (splittedLine.size() > NUMBER_OF_SEPARATORS + 1) {
+            int indexOfLastElement = splittedLine.size() - 1;
+
+            String cnpj = splittedLine.get(1);
+            String businessArea = splittedLine.get(indexOfLastElement);
+
+            List<String> splittedName = splittedLine.subList(2, indexOfLastElement);
+            String name = String.join(SEPARATOR, splittedName);
+
+            return new Customer(cnpj, name, businessArea);
+        }
+
+        if (splittedLine.size() == NUMBER_OF_SEPARATORS + 1) {
+            String cnpj = splittedLine.get(1);
+            String name = splittedLine.get(2);
+            String businessArea = splittedLine.get(3);
+
+            return new Customer(cnpj, name, businessArea);
+        }
+
+        throw new InvalidSeparatorException(INVALID_SEPARATOR_MESSAGE);
     }
 
-    private Salesman processSalesmen(String line) {
-        return null;
+    private Sale processSale(String line) {
+        logger.info("Processing sale from line: " + line);
+
+        List<String> splittedLine = Arrays.asList(line.split(SEPARATOR));
+
+        if (splittedLine.size() > NUMBER_OF_SEPARATORS + 1) {
+            String saleId = splittedLine.get(1);
+            String itemsData = splittedLine.get(2);
+
+            List<String> itemsText = Arrays.asList(itemsData.substring(1, itemsData.length() - 1).split(","));
+
+            List<Item> items = itemsText.stream()
+                    .map(this::processItem)
+                    .collect(Collectors.toList());
+
+            List<String> splittedName = splittedLine.subList(3, splittedLine.size() - 1);
+            String name = String.join(SEPARATOR, splittedName);
+
+            return new Sale(saleId, items, name);
+        }
+
+        if (splittedLine.size() == NUMBER_OF_SEPARATORS + 1) {
+            String saleId = splittedLine.get(1);
+            String itemsData = splittedLine.get(2);
+
+            List<String> itemsText = Arrays.asList(itemsData.substring(1, itemsData.length() - 1).split(","));
+
+            List<Item> items = itemsText.stream()
+                    .map(this::processItem)
+                    .collect(Collectors.toList());
+
+            String name = splittedLine.get(3);
+
+            return new Sale(saleId, items, name);
+        }
+
+        throw new InvalidSeparatorException(INVALID_SEPARATOR_MESSAGE);
+    }
+
+    private Item processItem(String itemText) {
+        String[] splittedText = itemText.split("-");
+
+        String id = splittedText[0];
+        Integer quantity = Integer.valueOf(splittedText[1]);
+        Double price = Double.valueOf(splittedText[2]);
+
+        return new Item(id, quantity, price);
     }
 
     //TO-DO skipar a linha com problema e processar as demais
     private void validateFile(List<String> fileLines) {
-        logger.info("Beginning to validade file.");
+        logger.info("Beginning to validate file.");
         List<LineIdentifier> identifiers = Arrays.asList(LineIdentifier.values());
 
         fileLines.forEach(line -> {
@@ -75,14 +171,14 @@ public class SalesDataProcessor {
             String lineIdentifier = line.substring(0, 3);
 
             if (identifiers.stream().noneMatch(identifier -> identifier.getIdentifier().equals(lineIdentifier))) {
-                throw new InvalidIdentifierException();
+                throw new InvalidIdentifierException(INVALID_IDENTIFIER_MESSAGE);
             }
 
             if (line.split(SEPARATOR).length < NUMBER_OF_SEPARATORS || line.startsWith(SEPARATOR, 3)) {
-                throw new InvalidSeparatorException();
+                throw new InvalidSeparatorException(INVALID_SEPARATOR_MESSAGE);
             }
         });
 
-        logger.info("lines validated.");
+        logger.info("Validated lines.");
     }
 }

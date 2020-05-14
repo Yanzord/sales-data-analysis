@@ -7,15 +7,19 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
 import static com.github.yanzord.salesdataanalysis.constant.Constants.*;
 
 public class SalesDataDAO {
+    private static final SalesDataDAO INSTANCE = new SalesDataDAO();
     private static final String FILE_EXTENSION = ".dat";
     private Logger logger = Logger.getLogger(SalesDataDAO.class);
+
+    public static SalesDataDAO getINSTANCE() {
+        return INSTANCE;
+    }
 
     public List<String> readFile(Path file) {
         logger.info("Reading File: " + file.toString());
@@ -29,22 +33,22 @@ public class SalesDataDAO {
         }
 
         try {
-            return Files.readAllLines(file);
+            return Files.readAllLines(INPUT_FILE_PATH.resolve(file));
         } catch (IOException e) {
             logger.error("An error has occurred while reading the file: " + e.getMessage());
             return Collections.emptyList();
         }
     }
 
-    public void writeFile(String fileName, String content) {
-        logger.info("Starting to write file: " + fileName);
+    public void writeFile(Path file, String content) {
+        logger.info("Starting to write file: " + file.toString());
 
         if (!Files.exists(OUTPUT_FILE_PATH)) {
             throw new DirectoryNotFoundException("Output directory doesn't exist.");
         }
 
         try {
-            Files.write(OUTPUT_FILE_PATH.resolve(Paths.get(fileName)), content.getBytes());
+            Files.write(OUTPUT_FILE_PATH.resolve(file), content.getBytes());
         } catch (IOException e) {
             logger.error("An error has occurred while writing the file: " + e.getMessage());
         }

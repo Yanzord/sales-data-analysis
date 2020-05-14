@@ -19,7 +19,7 @@ public class SalesDataProcessor {
     private Logger logger = Logger.getLogger(SalesDataProcessor.class);
 
     public SalesDataProcessor() {
-        this.salesDataDAO = new SalesDataDAO();
+        this.salesDataDAO = SalesDataDAO.getINSTANCE();
     }
 
     public SalesData processFile(Path file) {
@@ -59,7 +59,7 @@ public class SalesDataProcessor {
     private Salesman processSalesman(String line) {
         logger.info("Processing salesman from line: " + line);
 
-        List<String> splittedLine = Arrays.asList(line.split(SEPARATOR));
+        List<String> splittedLine = Arrays.asList(line.split(DATA_SEPARATOR));
 
         if (splittedLine.size() > NUMBER_OF_SEPARATORS + 1) {
             int indexOfLastElement = splittedLine.size() - 1;
@@ -67,8 +67,8 @@ public class SalesDataProcessor {
             String cpf = splittedLine.get(1);
             Double salary = Double.valueOf(splittedLine.get(indexOfLastElement));
 
-            List<String> splittedName = splittedLine.subList(1, indexOfLastElement);
-            String name = String.join(SEPARATOR, splittedName);
+            List<String> splittedName = splittedLine.subList(2, indexOfLastElement);
+            String name = String.join(DATA_SEPARATOR, splittedName);
 
             return new Salesman(cpf, name, salary);
         }
@@ -87,7 +87,7 @@ public class SalesDataProcessor {
     private Customer processCustomer(String line) {
         logger.info("Processing customer from line: " + line);
 
-        List<String> splittedLine = Arrays.asList(line.split(SEPARATOR));
+        List<String> splittedLine = Arrays.asList(line.split(DATA_SEPARATOR));
 
         if (splittedLine.size() > NUMBER_OF_SEPARATORS + 1) {
             int indexOfLastElement = splittedLine.size() - 1;
@@ -96,7 +96,7 @@ public class SalesDataProcessor {
             String businessArea = splittedLine.get(indexOfLastElement);
 
             List<String> splittedName = splittedLine.subList(2, indexOfLastElement);
-            String name = String.join(SEPARATOR, splittedName);
+            String name = String.join(DATA_SEPARATOR, splittedName);
 
             return new Customer(cnpj, name, businessArea);
         }
@@ -115,20 +115,17 @@ public class SalesDataProcessor {
     private Sale processSale(String line) {
         logger.info("Processing sale from line: " + line);
 
-        List<String> splittedLine = Arrays.asList(line.split(SEPARATOR));
+        List<String> splittedLine = Arrays.asList(line.split(DATA_SEPARATOR));
 
         if (splittedLine.size() > NUMBER_OF_SEPARATORS + 1) {
             String saleId = splittedLine.get(1);
             String itemsData = splittedLine.get(2);
 
-            List<String> itemsText = Arrays.asList(itemsData.substring(1, itemsData.length() - 1).split(","));
+            List<String> itemsText = Arrays.asList(itemsData.substring(1, itemsData.length() - 1).split(ITEMS_SEPARATOR));
+            List<Item> items = processItems(itemsText);
 
-            List<Item> items = itemsText.stream()
-                    .map(this::processItem)
-                    .collect(Collectors.toList());
-
-            List<String> splittedName = splittedLine.subList(3, splittedLine.size() - 1);
-            String name = String.join(SEPARATOR, splittedName);
+            List<String> splittedName = splittedLine.subList(3, splittedLine.size());
+            String name = String.join(DATA_SEPARATOR, splittedName);
 
             return new Sale(saleId, items, name);
         }
@@ -137,11 +134,8 @@ public class SalesDataProcessor {
             String saleId = splittedLine.get(1);
             String itemsData = splittedLine.get(2);
 
-            List<String> itemsText = Arrays.asList(itemsData.substring(1, itemsData.length() - 1).split(","));
-
-            List<Item> items = itemsText.stream()
-                    .map(this::processItem)
-                    .collect(Collectors.toList());
+            List<String> itemsText = Arrays.asList(itemsData.substring(1, itemsData.length() - 1).split(ITEMS_SEPARATOR));
+            List<Item> items = processItems(itemsText);
 
             String name = splittedLine.get(3);
 
@@ -151,14 +145,20 @@ public class SalesDataProcessor {
         throw new InvalidSeparatorException(INVALID_SEPARATOR_MESSAGE);
     }
 
-    private Item processItem(String itemText) {
-        String[] splittedText = itemText.split("-");
+    private List<Item> processItems(List<String> itemsText) {
+        List<Item> items = new ArrayList<>();
 
-        String id = splittedText[0];
-        Integer quantity = Integer.valueOf(splittedText[1]);
-        Double price = Double.valueOf(splittedText[2]);
+        itemsText.forEach(itemText -> {
+            String[] splittedText = itemText.split(ITEMS_DATA_SEPARATOR);
 
-        return new Item(id, quantity, price);
+            String id = splittedText[0];
+            Integer quantity = Integer.valueOf(splittedText[1]);
+            Double price = Double.valueOf(splittedText[2]);
+
+            items.add(new Item(id, quantity, price));
+        });
+
+        return items;
     }
 
     //TO-DO skipar a linha com problema e processar as demais
@@ -174,11 +174,11 @@ public class SalesDataProcessor {
                 throw new InvalidIdentifierException(INVALID_IDENTIFIER_MESSAGE);
             }
 
-            if (line.split(SEPARATOR).length < NUMBER_OF_SEPARATORS || line.startsWith(SEPARATOR, 3)) {
+            if (line.split(DATA_SEPARATOR).length < NUMBER_OF_SEPARATORS || !line.startsWith(DATA_SEPARATOR, 3)) {
                 throw new InvalidSeparatorException(INVALID_SEPARATOR_MESSAGE);
             }
         });
 
-        logger.info("Validated lines.");
+        logger.info("Validated file.");
     }
 }

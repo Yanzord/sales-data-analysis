@@ -12,14 +12,9 @@ import java.util.List;
 
 import static com.github.yanzord.salesdataanalysis.constant.Constants.*;
 
-public class SalesDataDAO {
-    private static final SalesDataDAO INSTANCE = new SalesDataDAO();
+public class FileDAO {
     private static final String FILE_EXTENSION = ".dat";
-    private Logger logger = Logger.getLogger(SalesDataDAO.class);
-
-    public static SalesDataDAO getINSTANCE() {
-        return INSTANCE;
-    }
+    private Logger logger = Logger.getLogger(FileDAO.class);
 
     public List<String> readFile(Path file) {
         logger.info("Reading File: " + file.toString());

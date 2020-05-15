@@ -1,23 +1,23 @@
 package com.github.yanzord.salesdataanalysis.service;
 
+import com.github.yanzord.salesdataanalysis.exception.InvalidFileException;
 import com.github.yanzord.salesdataanalysis.model.Sale;
 import com.github.yanzord.salesdataanalysis.model.SalesData;
 import com.github.yanzord.salesdataanalysis.model.Salesman;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SalesDataAnalyzer {
-    private SalesDataProcessor salesDataProcessor;
+public class Analyzer {
+    private Processor processor;
 
-    public SalesDataAnalyzer() {
-        this.salesDataProcessor = new SalesDataProcessor();
+    public Analyzer() {
+        this.processor = new Processor();
     }
 
-    public String analyzeFile(Path file) {
-        SalesData salesData = salesDataProcessor.processFile(file);
+    public String analyzeFile(List<String> fileLines) throws InvalidFileException {
+        SalesData salesData = processor.processFile(fileLines);
 
         Integer customerQuantity = salesData.getCustomers().size();
         Integer salesmenQuantity = salesData.getSalesmen().size();
@@ -79,5 +79,4 @@ public class SalesDataAnalyzer {
                 .next()
                 .getKey();
     }
-
 }

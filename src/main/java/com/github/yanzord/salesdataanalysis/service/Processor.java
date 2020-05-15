@@ -1,31 +1,24 @@
 package com.github.yanzord.salesdataanalysis.service;
 
-import com.github.yanzord.salesdataanalysis.dao.SalesDataDAO;
+import com.github.yanzord.salesdataanalysis.exception.InvalidFileException;
 import com.github.yanzord.salesdataanalysis.exception.InvalidIdentifierException;
 import com.github.yanzord.salesdataanalysis.exception.InvalidSeparatorException;
 import com.github.yanzord.salesdataanalysis.model.*;
 import org.apache.log4j.Logger;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.github.yanzord.salesdataanalysis.constant.Constants.*;
 
-public class SalesDataProcessor {
-    private SalesDataDAO salesDataDAO;
-    private Logger logger = Logger.getLogger(SalesDataProcessor.class);
+public class Processor {
+    private Logger logger = Logger.getLogger(Processor.class);
 
-    public SalesDataProcessor() {
-        this.salesDataDAO = SalesDataDAO.getINSTANCE();
-    }
-
-    public SalesData processFile(Path file) {
-        List<String> fileLines = salesDataDAO.readFile(file);
-
-        validateFile(fileLines);
+    public SalesData processFile(List<String> fileLines) throws InvalidFileException {
+        if (!isValidFile(fileLines)) {
+            throw new InvalidFileException();
+        }
 
         List<Salesman> salesmen = new ArrayList<>();
         List<Customer> customers = new ArrayList<>();
@@ -56,7 +49,7 @@ public class SalesDataProcessor {
         return new SalesData(salesmen, customers, sales);
     }
 
-    private Salesman processSalesman(String line) {
+    public Salesman processSalesman(String line) {
         logger.info("Processing salesman from line: " + line);
 
         List<String> splittedLine = Arrays.asList(line.split(DATA_SEPARATOR));
@@ -84,7 +77,7 @@ public class SalesDataProcessor {
         throw new InvalidSeparatorException(INVALID_SEPARATOR_MESSAGE);
     }
 
-    private Customer processCustomer(String line) {
+    public Customer processCustomer(String line) {
         logger.info("Processing customer from line: " + line);
 
         List<String> splittedLine = Arrays.asList(line.split(DATA_SEPARATOR));
@@ -112,7 +105,7 @@ public class SalesDataProcessor {
         throw new InvalidSeparatorException(INVALID_SEPARATOR_MESSAGE);
     }
 
-    private Sale processSale(String line) {
+    public Sale processSale(String line) {
         logger.info("Processing sale from line: " + line);
 
         List<String> splittedLine = Arrays.asList(line.split(DATA_SEPARATOR));
@@ -145,7 +138,7 @@ public class SalesDataProcessor {
         throw new InvalidSeparatorException(INVALID_SEPARATOR_MESSAGE);
     }
 
-    private List<Item> processItems(List<String> itemsText) {
+    public List<Item> processItems(List<String> itemsText) {
         List<Item> items = new ArrayList<>();
 
         itemsText.forEach(itemText -> {
@@ -162,23 +155,26 @@ public class SalesDataProcessor {
     }
 
     //TO-DO skipar a linha com problema e processar as demais
-    private void validateFile(List<String> fileLines) {
+    public boolean isValidFile(List<String> fileLines) {
         logger.info("Beginning to validate file.");
         List<LineIdentifier> identifiers = Arrays.asList(LineIdentifier.values());
 
-        fileLines.forEach(line -> {
+        for (String line : fileLines) {
             logger.info("Line " + line);
             String lineIdentifier = line.substring(0, 3);
 
             if (identifiers.stream().noneMatch(identifier -> identifier.getIdentifier().equals(lineIdentifier))) {
-                throw new InvalidIdentifierException(INVALID_IDENTIFIER_MESSAGE);
+                logger.warn("Invalid file, reason: line identifier.");
+                return false;
             }
 
             if (line.split(DATA_SEPARATOR).length < NUMBER_OF_SEPARATORS || !line.startsWith(DATA_SEPARATOR, 3)) {
-                throw new InvalidSeparatorException(INVALID_SEPARATOR_MESSAGE);
+                logger.warn("Invalid file, reason: separator.");
+                return false;
             }
-        });
+        }
 
         logger.info("Validated file.");
+        return true;
     }
 }

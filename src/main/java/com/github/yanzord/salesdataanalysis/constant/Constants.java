@@ -11,4 +11,9 @@ public class Constants {
     public static final int NUMBER_OF_SEPARATORS = 3;
     public static final String ITEMS_SEPARATOR = ",";
     public static final String ITEMS_DATA_SEPARATOR = "-";
+    public static final long THREAD_EXECUTION_TIME = 500;
+    public static final String OUTPUT_TEXT = "Customer quantity: %s\n" +
+            "Salesmen quantity: %s\n" +
+            "Most expensive sale id: %s\n" +
+            "Worst salesman: %s";
 }

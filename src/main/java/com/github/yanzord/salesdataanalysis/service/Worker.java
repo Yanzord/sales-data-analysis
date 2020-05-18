@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.github.yanzord.salesdataanalysis.constant.Constants.INPUT_FILE_PATH;
+import static com.github.yanzord.salesdataanalysis.constant.Constants.THREAD_EXECUTION_TIME;
 
 public class Worker implements Runnable {
     private FileDAO fileDAO;
     private Analyzer analyzer;
-    private static final long THREAD_EXECUTION_TIME = 500;
     private static final Logger logger = Logger.getLogger(Worker.class);
 
     public Worker() {
@@ -40,6 +40,7 @@ public class Worker implements Runnable {
     public void initialize() {
         try {
             List<Path> files = Files.walk(INPUT_FILE_PATH).filter(Files::isRegularFile).collect(Collectors.toList());
+
             for (Path file : files) {
                 if (Files.isRegularFile(file)) {
                     Path fileName = file.getFileName();
@@ -65,6 +66,7 @@ public class Worker implements Runnable {
                     Path fileName = Paths.get(event.context().toString());
                     processFile(fileName);
                 }
+
                 key.reset();
             }
         } catch (IOException | InterruptedException | InvalidFileExtensionException | DirectoryNotFoundException e) {

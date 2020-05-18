@@ -13,12 +13,11 @@ repositories {
 
 dependencies {
     implementation([
-        'log4j:log4j:1.2.17',
+        'log4j:log4j:1.2.17'
     ])
 
     testImplementation([
-            'junit:junit:4.12',
-            'org.mockito:mockito-all:1.10.19'
+            'junit:junit:4.12'
     ])
 }
 

@@ -17,23 +17,11 @@ public class Sale {
         return saleId;
     }
 
-    public void setSaleId(String saleId) {
-        this.saleId = saleId;
-    }
-
     public List<Item> getItems() {
         return items;
     }
 
-    public void setItems(List<Item> items) {
-        this.items = items;
-    }
-
     public String getSalesmanName() {
         return salesmanName;
-    }
-
-    public void setSalesmanName(String salesmanName) {
-        this.salesmanName = salesmanName;
     }
 }

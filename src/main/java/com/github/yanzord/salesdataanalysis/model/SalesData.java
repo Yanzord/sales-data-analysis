@@ -7,8 +7,6 @@ public class SalesData {
     private List<Sale> sales;
     private List<Salesman> salesmen;
 
-    public SalesData(){}
-
     public SalesData(List<Salesman> salesmen, List<Customer> customers, List<Sale> sales) {
         this.salesmen = salesmen;
         this.customers = customers;

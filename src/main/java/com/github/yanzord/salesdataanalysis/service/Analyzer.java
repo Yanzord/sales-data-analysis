@@ -9,12 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.github.yanzord.salesdataanalysis.constant.Constants.OUTPUT_TEXT;
+
 public class Analyzer {
     private Processor processor;
-    private static final String OUTPUT_TEXT = "Customer quantity:  %s\n" +
-            "Salesmen quantity: %s\n" +
-            "Most expensive sale id: %s\n" +
-            "Worst salesman: %s";
 
     public Analyzer() {
         this.processor = new Processor();
@@ -37,7 +35,7 @@ public class Analyzer {
         return String.format(OUTPUT_TEXT, customerQuantity, salesmenQuantity, mostExpensiveSaleId, worstSalesman);
     }
 
-    private String getMostExpensiveSaleId(SalesData salesData) {
+    public String getMostExpensiveSaleId(SalesData salesData) {
         List<Sale> sales = salesData.getSales();
         Map<String, Double> salePriceRank = new HashMap<>();
 
@@ -60,7 +58,7 @@ public class Analyzer {
                 .getKey();
     }
 
-    private String getWorstSalesman(SalesData salesData) {
+    public String getWorstSalesman(SalesData salesData) {
         List<Sale> sales = salesData.getSales();
         List<Salesman> salesmen = salesData.getSalesmen();
 

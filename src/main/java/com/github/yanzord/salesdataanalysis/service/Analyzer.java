@@ -1,6 +1,5 @@
 package com.github.yanzord.salesdataanalysis.service;
 
-import com.github.yanzord.salesdataanalysis.exception.InvalidFileException;
 import com.github.yanzord.salesdataanalysis.model.Sale;
 import com.github.yanzord.salesdataanalysis.model.SalesData;
 import com.github.yanzord.salesdataanalysis.model.Salesman;
@@ -8,27 +7,34 @@ import com.github.yanzord.salesdataanalysis.model.Salesman;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class Analyzer {
     private Processor processor;
+    private static final String OUTPUT_TEXT = "Customer quantity:  %s\n" +
+            "Salesmen quantity: %s\n" +
+            "Most expensive sale id: %s\n" +
+            "Worst salesman: %s";
 
     public Analyzer() {
         this.processor = new Processor();
     }
 
-    public String analyzeFile(List<String> fileLines) throws InvalidFileException {
-        SalesData salesData = processor.processFile(fileLines);
+    public String analyzeFile(List<String> fileLines) {
+        Optional<SalesData> salesDataOptional = processor.process(fileLines);
+
+        if(!salesDataOptional.isPresent()) {
+            return String.format(OUTPUT_TEXT, 0, 0, "none", "none");
+        }
+
+        SalesData salesData = salesDataOptional.get();
 
         Integer customerQuantity = salesData.getCustomers().size();
         Integer salesmenQuantity = salesData.getSalesmen().size();
         String mostExpensiveSaleId = getMostExpensiveSaleId(salesData);
         String worstSalesman = getWorstSalesman(salesData);
 
-
-        return "Customer quantity: " + customerQuantity + "\n" +
-                "Salesmen quantity: " + salesmenQuantity + "\n" +
-                "Most expensive sale id: " + mostExpensiveSaleId + "\n" +
-                "Worst salesman: " + worstSalesman;
+        return String.format(OUTPUT_TEXT, customerQuantity, salesmenQuantity, mostExpensiveSaleId, worstSalesman);
     }
 
     private String getMostExpensiveSaleId(SalesData salesData) {

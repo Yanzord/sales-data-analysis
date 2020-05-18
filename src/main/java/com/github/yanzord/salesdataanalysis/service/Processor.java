@@ -1,23 +1,25 @@
 package com.github.yanzord.salesdataanalysis.service;
 
-import com.github.yanzord.salesdataanalysis.exception.InvalidFileException;
-import com.github.yanzord.salesdataanalysis.exception.InvalidIdentifierException;
-import com.github.yanzord.salesdataanalysis.exception.InvalidSeparatorException;
 import com.github.yanzord.salesdataanalysis.model.*;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static com.github.yanzord.salesdataanalysis.constant.Constants.*;
 
 public class Processor {
     private Logger logger = Logger.getLogger(Processor.class);
 
-    public SalesData processFile(List<String> fileLines) throws InvalidFileException {
+    public Optional<SalesData> process(List<String> fileLines) {
+        if (fileLines.isEmpty()) {
+            logger.warn("File is empty, system will generate a default empty file.");
+            return Optional.empty();
+        }
         if (!isValidFile(fileLines)) {
-            throw new InvalidFileException();
+            return Optional.empty();
         }
 
         List<Salesman> salesmen = new ArrayList<>();
@@ -40,13 +42,10 @@ public class Processor {
                     sales.add(processSale(line));
                     break;
                 }
-                default: {
-                    throw new InvalidIdentifierException(INVALID_IDENTIFIER_MESSAGE);
-                }
             }
         });
 
-        return new SalesData(salesmen, customers, sales);
+        return Optional.of(new SalesData(salesmen, customers, sales));
     }
 
     public Salesman processSalesman(String line) {
@@ -66,15 +65,11 @@ public class Processor {
             return new Salesman(cpf, name, salary);
         }
 
-        if (splittedLine.size() == NUMBER_OF_SEPARATORS + 1) {
-            String cpf = splittedLine.get(1);
-            String name = splittedLine.get(2);
-            Double salary = Double.valueOf(splittedLine.get(3));
+        String cpf = splittedLine.get(1);
+        String name = splittedLine.get(2);
+        Double salary = Double.valueOf(splittedLine.get(3));
 
-            return new Salesman(cpf, name, salary);
-        }
-
-        throw new InvalidSeparatorException(INVALID_SEPARATOR_MESSAGE);
+        return new Salesman(cpf, name, salary);
     }
 
     public Customer processCustomer(String line) {
@@ -94,15 +89,11 @@ public class Processor {
             return new Customer(cnpj, name, businessArea);
         }
 
-        if (splittedLine.size() == NUMBER_OF_SEPARATORS + 1) {
-            String cnpj = splittedLine.get(1);
-            String name = splittedLine.get(2);
-            String businessArea = splittedLine.get(3);
+        String cnpj = splittedLine.get(1);
+        String name = splittedLine.get(2);
+        String businessArea = splittedLine.get(3);
 
-            return new Customer(cnpj, name, businessArea);
-        }
-
-        throw new InvalidSeparatorException(INVALID_SEPARATOR_MESSAGE);
+        return new Customer(cnpj, name, businessArea);
     }
 
     public Sale processSale(String line) {
@@ -123,19 +114,15 @@ public class Processor {
             return new Sale(saleId, items, name);
         }
 
-        if (splittedLine.size() == NUMBER_OF_SEPARATORS + 1) {
-            String saleId = splittedLine.get(1);
-            String itemsData = splittedLine.get(2);
+        String saleId = splittedLine.get(1);
+        String itemsData = splittedLine.get(2);
 
-            List<String> itemsText = Arrays.asList(itemsData.substring(1, itemsData.length() - 1).split(ITEMS_SEPARATOR));
-            List<Item> items = processItems(itemsText);
+        List<String> itemsText = Arrays.asList(itemsData.substring(1, itemsData.length() - 1).split(ITEMS_SEPARATOR));
+        List<Item> items = processItems(itemsText);
 
-            String name = splittedLine.get(3);
+        String name = splittedLine.get(3);
 
-            return new Sale(saleId, items, name);
-        }
-
-        throw new InvalidSeparatorException(INVALID_SEPARATOR_MESSAGE);
+        return new Sale(saleId, items, name);
     }
 
     public List<Item> processItems(List<String> itemsText) {
@@ -154,7 +141,6 @@ public class Processor {
         return items;
     }
 
-    //TO-DO skipar a linha com problema e processar as demais
     public boolean isValidFile(List<String> fileLines) {
         logger.info("Beginning to validate file.");
         List<LineIdentifier> identifiers = Arrays.asList(LineIdentifier.values());

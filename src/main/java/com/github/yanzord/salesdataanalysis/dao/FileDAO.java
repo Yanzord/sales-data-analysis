@@ -16,7 +16,7 @@ public class FileDAO {
     private static final String FILE_EXTENSION = ".dat";
     private Logger logger = Logger.getLogger(FileDAO.class);
 
-    public List<String> readFile(Path file) {
+    public List<String> readFile(Path file) throws InvalidFileExtensionException, DirectoryNotFoundException {
         logger.info("Reading File: " + file.toString());
 
         if (!Files.exists(INPUT_FILE_PATH)) {
@@ -35,7 +35,7 @@ public class FileDAO {
         }
     }
 
-    public void writeFile(Path file, String content) {
+    public void writeFile(Path file, String content) throws DirectoryNotFoundException {
         logger.info("Starting to write file: " + file.toString());
 
         if (!Files.exists(OUTPUT_FILE_PATH)) {

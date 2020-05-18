@@ -1,6 +1,5 @@
 package com.github.yanzord.salesdataanalysis.service;
 
-import com.github.yanzord.salesdataanalysis.exception.InvalidSeparatorException;
 import com.github.yanzord.salesdataanalysis.model.Customer;
 import com.github.yanzord.salesdataanalysis.model.Salesman;
 import org.junit.Test;
@@ -64,13 +63,6 @@ public class ProcessorTest {
         assertEquals(expected.getSalary(), actual.getSalary(), DELTA);
     }
 
-    @Test(expected = InvalidSeparatorException.class)
-    public void shouldNotProcessSalesmanWhenTheNumberOfSeparatorsIsInvalid() {
-        String salesmanLine = "001ç3245678865434çPaulo";
-
-        processor.processSalesman(salesmanLine);
-    }
-
     @Test
     public void shouldProcessCustomer() {
         String customerLine = "002ç2345675434544345çAndrei da SilvaçRural";
@@ -80,12 +72,5 @@ public class ProcessorTest {
         assertEquals(expected.getCnpj(), actual.getCnpj());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getBusinessArea(), actual.getBusinessArea());
-    }
-
-    @Test(expected = InvalidSeparatorException.class)
-    public void shouldNotProcessCustomerhenTheNumberOfSeparatorsIsInvalid() {
-        String customerLine = "002ç2345675434544345çAndrei da Silva";
-
-        processor.processCustomer(customerLine);
     }
 }
